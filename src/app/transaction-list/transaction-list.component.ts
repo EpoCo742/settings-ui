@@ -57,21 +57,35 @@ export class TransactionListComponent {
     const settingBeingSaved = transaction.settings.find(setting => setting.isEditing);
     if (!settingBeingSaved) return;
     
-    const isDuplicate = transaction.settings.some(
-      setting => !setting.isEditing && 
-                 setting.indicator === settingBeingSaved.indicator &&
-                 setting.frequency === settingBeingSaved.frequency &&
-                 setting.authorized === settingBeingSaved.authorized
-    );
+    const isDuplicate = transaction.settings.some(existingSetting => {
+      if (!existingSetting.isEditing) {
+        return (
+          (existingSetting.indicator === settingBeingSaved.indicator || 
+           existingSetting.indicator === 'all' || 
+           settingBeingSaved.indicator === 'all') &&
+  
+          (existingSetting.frequency === settingBeingSaved.frequency || 
+           existingSetting.frequency === 'all' || 
+           settingBeingSaved.frequency === 'all') &&
+  
+          (existingSetting.authorized === settingBeingSaved.authorized || 
+           existingSetting.authorized === 'all' || 
+           settingBeingSaved.authorized === 'all')
+        );
+      }
+      return false;
+    });
   
     if (isDuplicate) {
-      alert("Error: A setting with the same Indicator, Frequency, and Authorized already exists.");
-      return;
+      alert("Error: A conflicting setting already exists for this transaction.");
+      return; // ✅ Prevent saving duplicate entry
     }
   
     settingBeingSaved.isEditing = false;
     this.savedTransactions = this.cleanTransactions(this.transactions);
   }
+
+  
   
 
   deleteSetting(transaction: Transaction, setting: TransactionSetting) {
