@@ -6,8 +6,8 @@ interface TransactionSetting {
   enabled: boolean;
   minimum: number;
   indicator: 'one' | 'two' | 'all';
-  frequency: 'weekly' | 'monthly' | 'annual';
-  authorized: 'yes' | 'no';
+  frequency: 'select' | 'weekly' | 'monthly' | 'annual';
+  authorized: 'all' |'yes' | 'no';
   isEditing?: boolean;
 }
 
@@ -33,17 +33,17 @@ export class TransactionListComponent {
 
   savedTransactions: Transaction[] = this.cleanTransactions(this.transactions); // ✅ Ensures JSON preview is initialized
 
-  indicatorOptions = ['one', 'two', 'all'];
-  frequencyOptions = ['weekly', 'monthly', 'annual'];
-  authorizedOptions = ['yes', 'no'];
+  indicatorOptions = ['all', 'one', 'two'];
+  frequencyOptions = ['select', 'weekly', 'monthly', 'annual'];
+  authorizedOptions = ['all', 'yes', 'no'];  
 
   addSetting(transaction: Transaction) {
     transaction.settings.push({
-      enabled: true, // ✅ Defaults to checked
-      minimum: 0,
-      indicator: 'one',
-      frequency: 'weekly',
-      authorized: 'yes',
+      enabled: true,  // ✅ Default checked
+      minimum: 0,  // ✅ User must update to non-zero
+      indicator: 'all',  // ✅ Default to "All"
+      frequency: 'select', // ✅ Default to invalid selection (forces user to choose)
+      authorized: 'all',  // ✅ Default to "All"
       isEditing: true
     });
   }
@@ -56,10 +56,19 @@ export class TransactionListComponent {
     const settingBeingSaved = transaction.settings.find(setting => setting.isEditing);
     if (!settingBeingSaved) return;
   
-    // Generate the compound key for the setting being saved
-    const newKey = `${settingBeingSaved.indicator}-${settingBeingSaved.frequency}-${settingBeingSaved.authorized}`;
+    // ✅ Enforce minimum must be greater than zero
+    if (settingBeingSaved.minimum <= 0) {
+      alert("Error: Minimum must be greater than zero.");
+      return;
+    }
   
-    // Check if another setting (excluding itself) already has the same key
+    // ✅ Enforce frequency selection (cannot be default "Select Frequency")
+    if (settingBeingSaved.frequency === "select") {
+      alert("Error: Please select a valid Frequency.");
+      return;
+    }
+  
+    // ✅ Check for duplicates (Indicator + Frequency + Authorized)
     const isDuplicate = transaction.settings.some(
       setting => !setting.isEditing && 
                  setting.indicator === settingBeingSaved.indicator &&
@@ -69,10 +78,10 @@ export class TransactionListComponent {
   
     if (isDuplicate) {
       alert("Error: A setting with the same Indicator, Frequency, and Authorized already exists.");
-      return; // ✅ Prevent saving duplicate entry
+      return;
     }
   
-    // If it's unique, proceed with saving
+    // ✅ If all validations pass, allow save
     settingBeingSaved.isEditing = false;
     this.savedTransactions = this.cleanTransactions(this.transactions); // ✅ Update JSON preview
   }
