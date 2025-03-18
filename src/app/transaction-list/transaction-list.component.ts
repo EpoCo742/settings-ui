@@ -53,9 +53,30 @@ export class TransactionListComponent {
   }
 
   saveSetting(transaction: Transaction) {
-    transaction.settings.forEach(setting => setting.isEditing = false); // ✅ Disable editing
+    const settingBeingSaved = transaction.settings.find(setting => setting.isEditing);
+    if (!settingBeingSaved) return;
+  
+    // Generate the compound key for the setting being saved
+    const newKey = `${settingBeingSaved.indicator}-${settingBeingSaved.frequency}-${settingBeingSaved.authorized}`;
+  
+    // Check if another setting (excluding itself) already has the same key
+    const isDuplicate = transaction.settings.some(
+      setting => !setting.isEditing && 
+                 setting.indicator === settingBeingSaved.indicator &&
+                 setting.frequency === settingBeingSaved.frequency &&
+                 setting.authorized === settingBeingSaved.authorized
+    );
+  
+    if (isDuplicate) {
+      alert("Error: A setting with the same Indicator, Frequency, and Authorized already exists.");
+      return; // ✅ Prevent saving duplicate entry
+    }
+  
+    // If it's unique, proceed with saving
+    settingBeingSaved.isEditing = false;
     this.savedTransactions = this.cleanTransactions(this.transactions); // ✅ Update JSON preview
   }
+  
 
   deleteSetting(transaction: Transaction, setting: TransactionSetting) {
     transaction.settings = transaction.settings.filter(s => s !== setting);
