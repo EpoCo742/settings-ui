@@ -80,18 +80,20 @@ export class TransactionListComponent {
   }
 
   formatCurrency(value: number): string {
-    return value.toLocaleString('en-US', { 
-      style: 'currency', 
-      currency: 'USD', 
+    return `$` + value.toLocaleString('en-US', { 
+      style: 'decimal', 
       minimumFractionDigits: 0 
-    }).replace(/\$/g, ''); 
+    });
   }
+  
 
   onMinimumChange(setting: TransactionSetting, event: Event) {
     const input = (event.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
     setting.minimum = parseInt(input, 10) || 0;
+  
     (event.target as HTMLInputElement).value = this.formatCurrency(setting.minimum);
   }
+  
 
   private cleanTransactions(transactions: Transaction[]): Transaction[] {
     return transactions.map(transaction => ({
