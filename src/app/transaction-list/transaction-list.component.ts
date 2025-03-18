@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 interface TransactionSetting {
   enabled: boolean;
   minimum: number;
   indicator: 'one' | 'two' | 'all';
-  frequency: 'select' | 'weekly' | 'monthly' | 'annual';
+  frequency: 'all' | 'one time' | 'recurring';
   authorized: 'all' |'yes' | 'no';
   isEditing?: boolean;
 }
@@ -21,7 +22,7 @@ interface Transaction {
   standalone: true,
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.scss'],
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, MatIconModule]
 })
 export class TransactionListComponent {
   transactions: Transaction[] = [
@@ -31,19 +32,19 @@ export class TransactionListComponent {
     { transactionType: 'Transaction D', settings: [] }
   ];
 
-  savedTransactions: Transaction[] = this.cleanTransactions(this.transactions); // ✅ Ensures JSON preview is initialized
+  savedTransactions: Transaction[] = this.cleanTransactions(this.transactions); 
 
   indicatorOptions = ['all', 'one', 'two'];
-  frequencyOptions = ['select', 'weekly', 'monthly', 'annual'];
+  frequencyOptions = ['all', 'one time', 'recurring'];
   authorizedOptions = ['all', 'yes', 'no'];  
 
   addSetting(transaction: Transaction) {
     transaction.settings.push({
-      enabled: true,  // ✅ Default checked
-      minimum: 0,  // ✅ User must update to non-zero
-      indicator: 'all',  // ✅ Default to "All"
-      frequency: 'select', // ✅ Default to invalid selection (forces user to choose)
-      authorized: 'all',  // ✅ Default to "All"
+      enabled: true,  
+      minimum: 0,  
+      indicator: 'all', 
+      frequency: 'all', 
+      authorized: 'all',  
       isEditing: true
     });
   }
@@ -55,20 +56,7 @@ export class TransactionListComponent {
   saveSetting(transaction: Transaction) {
     const settingBeingSaved = transaction.settings.find(setting => setting.isEditing);
     if (!settingBeingSaved) return;
-  
-    // ✅ Enforce minimum must be greater than zero
-    if (settingBeingSaved.minimum <= 0) {
-      alert("Error: Minimum must be greater than zero.");
-      return;
-    }
-  
-    // ✅ Enforce frequency selection (cannot be default "Select Frequency")
-    if (settingBeingSaved.frequency === "select") {
-      alert("Error: Please select a valid Frequency.");
-      return;
-    }
-  
-    // ✅ Check for duplicates (Indicator + Frequency + Authorized)
+    
     const isDuplicate = transaction.settings.some(
       setting => !setting.isEditing && 
                  setting.indicator === settingBeingSaved.indicator &&
@@ -81,9 +69,8 @@ export class TransactionListComponent {
       return;
     }
   
-    // ✅ If all validations pass, allow save
     settingBeingSaved.isEditing = false;
-    this.savedTransactions = this.cleanTransactions(this.transactions); // ✅ Update JSON preview
+    this.savedTransactions = this.cleanTransactions(this.transactions);
   }
   
 

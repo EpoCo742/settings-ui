@@ -5,47 +5,56 @@
       <!-- Settings Cards -->
       <div *ngFor="let setting of transaction.settings" class="setting-card">
         <div class="settings-controls">
-            <div class="input-group checkbox-group">
-                <label>
-                  <input type="checkbox" [(ngModel)]="setting.enabled" [disabled]="!setting.isEditing"/>
-                  Enabled
-                </label>
-              </div>
             <div class="input-group">
-            <label>Minimum: </label>
-            <input type="text" [value]="formatCurrency(setting.minimum)"
-                   (input)="onMinimumChange(setting, $event)" 
-                   [disabled]="!setting.isEditing"/>
+              <label>Minimum: </label>
+              <input type="text" [value]="formatCurrency(setting.minimum)"
+                     (input)="onMinimumChange(setting, $event)" 
+                     [disabled]="!setting.isEditing"/>
+            </div>
+            <div class="input-group">
+              <label>Indicator:</label>
+              <select [(ngModel)]="setting.indicator" [disabled]="!setting.isEditing">
+                <option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Frequency:</label>
+              <select [(ngModel)]="setting.frequency" [disabled]="!setting.isEditing">
+                <option value="select" disabled>Select Frequency</option>
+                <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Authorized:</label>
+              <select [(ngModel)]="setting.authorized" [disabled]="!setting.isEditing">
+                <option value="all">All</option>
+                <option *ngFor="let option of authorizedOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+            <div class="input-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="setting.enabled" [disabled]="!setting.isEditing"/>
+                Enabled
+              </label>
+            </div>
+          
+            <div class="button-group">
+              <button (click)="editSetting(setting)" *ngIf="!setting.isEditing">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button (click)="saveSetting(transaction)" *ngIf="setting.isEditing">
+                <mat-icon>save</mat-icon>
+              </button>
+              <button (click)="deleteSetting(transaction, setting)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
-          <div class="input-group">
-            <label>Indicator:</label>
-            <select [(ngModel)]="setting.indicator" [disabled]="!setting.isEditing">
-              <option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Frequency:</label>
-            <select [(ngModel)]="setting.frequency" [disabled]="!setting.isEditing">
-              <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Authorized:</label>
-            <select [(ngModel)]="setting.authorized" [disabled]="!setting.isEditing">
-              <option *ngFor="let option of authorizedOptions" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="button-group">
-          <button (click)="editSetting(setting)" *ngIf="!setting.isEditing">Edit</button>
-          <button (click)="saveSetting(transaction)" *ngIf="setting.isEditing">Save</button>
-          <button (click)="deleteSetting(transaction, setting)">Delete</button>
-        </div>
       </div>
   
       <!-- Add Settings Button (Always Below List) -->
       <div class="add-settings">
-        <button (click)="addSetting(transaction)">Add Setting</button>
+        <button (click)="addSetting(transaction)"><mat-icon color="primary">add_circle</mat-icon>Add Rule</button>
       </div>
     </div>
   
