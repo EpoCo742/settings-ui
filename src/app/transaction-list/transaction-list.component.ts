@@ -76,22 +76,31 @@ export class TransactionListComponent {
       const transaction = this.transactions.find(t => t.transactionType === transactionType);
       if (transaction) {
         // ✅ Prevent duplicate rules per transaction
-        const isDuplicate = transaction.settings.some(existingSetting => 
-          (existingSetting.indicator === this.multiRule.indicator || 
-          existingSetting.indicator === 'all' || 
-          this.multiRule.indicator === 'all') &&
+        const isDuplicate = transaction.settings.some(existingSetting =>
+          (existingSetting.indicator === this.multiRule.indicator ||
+            existingSetting.indicator === 'all' ||
+            this.multiRule.indicator === 'all') &&
 
-          (existingSetting.frequency === this.multiRule.frequency || 
-          existingSetting.frequency === 'all' || 
-          this.multiRule.frequency === 'all') &&
+          (existingSetting.frequency === this.multiRule.frequency ||
+            existingSetting.frequency === 'all' ||
+            this.multiRule.frequency === 'all') &&
 
-          (existingSetting.authorized === this.multiRule.authorized || 
-          existingSetting.authorized === 'all' || 
-          this.multiRule.authorized === 'all')
+          (existingSetting.authorized === this.multiRule.authorized ||
+            existingSetting.authorized === 'all' ||
+            this.multiRule.authorized === 'all')
         );
+
+        let duplicateFound = false;
 
         if (!isDuplicate) {
           transaction.settings.push({ ...this.multiRule, isEditing: false });
+        } else {
+          duplicateFound = true;
+        }
+
+        if (duplicateFound) {
+          alert("Error: A conflicting rule already exists.");
+          return;
         }
       }
     });
@@ -99,21 +108,21 @@ export class TransactionListComponent {
     this.savedTransactions = this.cleanTransactions(this.transactions);
     sessionStorage.setItem('savedTransactions', JSON.stringify(this.savedTransactions));
 
-     // ✅ Clear selected transactions
- this.selectedTransactions = [];
+    // ✅ Clear selected transactions
+    this.selectedTransactions = [];
 
- // ✅ Reset multiRule settings
- this.multiRule = {
-   enabled: true,
-   minimum: 0,
-   indicator: 'all',
-   frequency: 'all',
-   authorized: 'all',
-   isEditing: true
- };
+    // ✅ Reset multiRule settings
+    this.multiRule = {
+      enabled: true,
+      minimum: 0,
+      indicator: 'all',
+      frequency: 'all',
+      authorized: 'all',
+      isEditing: true
+    };
 
- // ✅ Close the dropdown after applying the rule
- this.dropdownOpen = false;
+    // ✅ Close the dropdown after applying the rule
+    this.dropdownOpen = false;
   }
 
   editSetting(setting: TransactionSetting) {
@@ -151,21 +160,21 @@ export class TransactionListComponent {
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
-   }
-   
-   selectTransaction(transactionType: string) {
+  }
+
+  selectTransaction(transactionType: string) {
     if (this.selectedTransactions.includes(transactionType)) {
       this.selectedTransactions = this.selectedTransactions.filter(t => t !== transactionType);
     } else {
       this.selectedTransactions.push(transactionType);
     }
-   }
-   
-   isSelected(transactionType: string): boolean {
-    return this.selectedTransactions.includes(transactionType);
-   }
+  }
 
-   handleOutsideClick(event: Event) {
+  isSelected(transactionType: string): boolean {
+    return this.selectedTransactions.includes(transactionType);
+  }
+
+  handleOutsideClick(event: Event) {
     const dropdownElement = document.querySelector('.dropdown');
     if (this.dropdownOpen && dropdownElement && !dropdownElement.contains(event.target as Node)) {
       this.dropdownOpen = false;
