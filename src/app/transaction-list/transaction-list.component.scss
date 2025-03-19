@@ -14,6 +14,7 @@
     /* Allows enough space for inline elements */
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     background: #f9f9f9;
+    margin-bottom: 1rem;
 }
 
 .setting-card {
@@ -29,45 +30,53 @@
 
 .settings-controls {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) 100px auto; /* ✅ 4 equal columns, then a small column, then auto-sized buttons */
+    grid-template-columns: repeat(4, 1fr) 100px auto;
+    /* ✅ 4 equal columns, then a small column, then auto-sized buttons */
     align-items: center;
-    gap: 0.3rem; /* ✅ Reduce overall spacing */
+    gap: 0.3rem;
+    /* ✅ Reduce overall spacing */
     width: 100%;
-  }
-  
-  .input-group select {
+}
+
+.input-group select {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: auto; /* ✅ Allows dynamic width */
-    min-width: 120px; /* ✅ Prevents shrinking too much */
-    max-width: 100%; /* ✅ Ensures it doesn't overflow */
-    white-space: nowrap; /* ✅ Prevents text wrapping */
-  }
-  
-  
-  .input-group label {
+    width: auto;
+    /* ✅ Allows dynamic width */
+    min-width: 120px;
+    /* ✅ Prevents shrinking too much */
+    max-width: 100%;
+    /* ✅ Ensures it doesn't overflow */
+    white-space: nowrap;
+    /* ✅ Prevents text wrapping */
+}
+
+.input-group label {
     font-size: 0.9rem;
     flex-shrink: 0;
-  }
-  
-  input[type="text"], select {
+}
+
+input[type="text"],
+select {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
     width: 100%;
-    max-width: 120px; /* ✅ Reduce input width slightly */
-  }
-  
-  .button-group {
+    max-width: 120px;
+    /* ✅ Reduce input width slightly */
+}
+
+.button-group {
     display: flex;
-    gap: 0.3rem; /* ✅ Reduce spacing between buttons */
+    gap: 0.3rem;
+    /* ✅ Reduce spacing between buttons */
     align-items: center;
     justify-content: flex-end;
-  }
-  
-  
-  button {
+}
+
+
+button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,21 +86,33 @@
     border-radius: 4px;
     cursor: pointer;
     background: none;
-  }
-  
-  button mat-icon {
+}
+
+button mat-icon {
     font-size: 20px;
-  }
-  
-  button:hover {
+}
+
+button:hover {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
-  }
-  
-  button:first-of-type mat-icon { color: #007bff; } /* Edit - Blue */
-  button:nth-of-type(2) mat-icon { color: #28a745; } /* Save - Green */
-  button:last-of-type mat-icon { color: #dc3545; } /* Delete - Red */
-  
+}
+
+button:first-of-type mat-icon {
+    color: #007bff;
+}
+
+/* Edit - Blue */
+button:nth-of-type(2) mat-icon {
+    color: #28a745;
+}
+
+/* Save - Green */
+button:last-of-type mat-icon {
+    color: #dc3545;
+}
+
+/* Delete - Red */
+
 .json-output {
     border: 1px solid #ccc;
     padding: 1rem;
@@ -112,15 +133,102 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    background: none; /* ✅ Keeps the button background normal */
-    color: inherit; /* ✅ Uses default text color */
+    background: none;
+    /* ✅ Keeps the button background normal */
+    color: inherit;
+    /* ✅ Uses default text color */
     font-weight: bold;
-  }
-  
-  .add-settings button:hover {
-    background: rgba(0, 0, 0, 0.1); /* ✅ Subtle hover effect */
-  }
-  
-  .add-settings button mat-icon {
-    color: #28a745; /* ✅ Green icon */
+}
+
+.add-settings button:hover {
+    background: rgba(0, 0, 0, 0.1);
+    /* ✅ Subtle hover effect */
+}
+
+.add-settings button mat-icon {
+    color: #28a745;
+    /* ✅ Green icon */
+}
+
+.multi-rule-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background: #f9f9f9;
+    margin-bottom: 1.5rem;
+    /* ✅ Space below the master control card */
+    text-align: center;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 1rem;
+}
+
+.dropdown-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    z-index: 10;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 0;
+}
+
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* ✅ Adds space between dropdown and selected items */
+}
+
+.selected-transactions {
+    font-size: 0.9rem;
+    color: #333;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dropdown-toggle mat-icon {
+    color: #333 !important;
+    font-size: 24px;
+    vertical-align: middle;
+}
+
+.apply-rule-icon {
+    color: #28a745 !important; /* ✅ Green icon */
   }

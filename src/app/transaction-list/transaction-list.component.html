@@ -1,67 +1,140 @@
-<div class="container">
-    <div *ngFor="let transaction of transactions" class="card">
-      <h3>{{ transaction.transactionType }}</h3>
-  
-      <!-- Settings Cards -->
-      <div *ngFor="let setting of transaction.settings" class="setting-card">
+<div class="page-wrapper">
+
+    <!-- Multi-Select Rules Card -->
+    <div class="multi-rule-card">
+        <h3>Apply Rules to Multiple Transactions</h3>
+        <div class="input-group">
+            <!-- ✅ New dropdown-based multi-select -->
+            <div class="dropdown-container">
+                <div class="dropdown">
+                    <button (click)="toggleDropdown()" class="dropdown-toggle">
+                        Select Transactions
+                        <mat-icon>arrow_drop_down</mat-icon>
+                    </button>
+                    <div *ngIf="dropdownOpen" class="dropdown-menu">
+                        <label *ngFor="let transaction of transactions" class="dropdown-item">
+                            <input type="checkbox" [checked]="isSelected(transaction.transactionType)"
+                                (change)="selectTransaction(transaction.transactionType)" />
+                            {{ transaction.transactionType }}
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ✅ Show selected transactions -->
+                <div class="selected-transactions">
+                    <span *ngIf="selectedTransactions.length > 0">Apply to:</span>
+                    <span *ngFor="let transaction of selectedTransactions">
+                        {{ transaction }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div class="settings-controls">
             <div class="input-group">
-              <label>Minimum: </label>
-              <input type="text" [value]="formatCurrency(setting.minimum)"
-                     (input)="onMinimumChange(setting, $event)" 
-                     [disabled]="!setting.isEditing"/>
+                <label>Minimum: </label>
+                <input type="text" [value]="formatCurrency(multiRule.minimum)"
+                    (input)="onMinimumChange(multiRule, $event)" />
             </div>
             <div class="input-group">
-              <label>Indicator:</label>
-              <select [(ngModel)]="setting.indicator" [disabled]="!setting.isEditing">
-                <option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</option>
-              </select>
+                <label>Indicator:</label>
+                <select [(ngModel)]="multiRule.indicator">
+                    <option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</option>
+                </select>
             </div>
             <div class="input-group">
-              <label>Frequency:</label>
-              <select [(ngModel)]="setting.frequency" [disabled]="!setting.isEditing">
-                <option value="select" disabled>Select Frequency</option>
-                <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
-              </select>
+                <label>Frequency:</label>
+                <select [(ngModel)]="multiRule.frequency">
+                    <option value="select" disabled>Select Frequency</option>
+                    <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
+                </select>
             </div>
             <div class="input-group">
-              <label>Authorized:</label>
-              <select [(ngModel)]="setting.authorized" [disabled]="!setting.isEditing">
-                <option value="all">All</option>
-                <option *ngFor="let option of authorizedOptions" [value]="option">{{ option }}</option>
-              </select>
+                <label>Authorized:</label>
+                <select [(ngModel)]="multiRule.authorized">
+                    <option value="all">All</option>
+                    <option *ngFor="let option of authorizedOptions" [value]="option">{{ option }}</option>
+                </select>
             </div>
             <div class="input-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="setting.enabled" [disabled]="!setting.isEditing"/>
-                Enabled
-              </label>
+                <label>
+                    <input type="checkbox" [(ngModel)]="multiRule.enabled" />
+                    Enabled
+                </label>
             </div>
-          
+
             <div class="button-group">
-              <button (click)="editSetting(setting)" *ngIf="!setting.isEditing">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button (click)="saveSetting(transaction)" *ngIf="setting.isEditing">
-                <mat-icon>save</mat-icon>
-              </button>
-              <button (click)="deleteSetting(transaction, setting)">
-                <mat-icon>delete</mat-icon>
-              </button>
+                <button (click)="addMultiRule()">
+                    <mat-icon color="primary" class="apply-rule-icon">add_circle</mat-icon> Apply Rule
+                </button>
             </div>
-          </div>
-      </div>
-  
-      <!-- Add Settings Button (Always Below List) -->
-      <div class="add-settings">
-        <button (click)="addSetting(transaction)"><mat-icon color="primary">add_circle</mat-icon>Add Rule</button>
-      </div>
+        </div>
     </div>
-  
+
+    <!-- Existing Transaction List -->
+    <div *ngFor="let transaction of transactions" class="card">
+        <h3>{{ transaction.transactionType }}</h3>
+
+        <!-- Add Setting Button (Always Below the List) -->
+        <div class="add-settings">
+            <button (click)="addSetting(transaction)">
+                <mat-icon>add_circle</mat-icon> Add Setting
+            </button>
+        </div>
+
+        <div *ngFor="let setting of transaction.settings" class="setting-card">
+            <div class="settings-controls">
+                <div class="input-group">
+                    <label>Minimum: </label>
+                    <input type="text" [value]="formatCurrency(setting.minimum)"
+                        (input)="onMinimumChange(setting, $event)" [disabled]="!setting.isEditing" />
+                </div>
+                <div class="input-group">
+                    <label>Indicator:</label>
+                    <select [(ngModel)]="setting.indicator" [disabled]="!setting.isEditing">
+                        <option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Frequency:</label>
+                    <select [(ngModel)]="setting.frequency" [disabled]="!setting.isEditing">
+                        <option value="select" disabled>Select Frequency</option>
+                        <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Authorized:</label>
+                    <select [(ngModel)]="setting.authorized" [disabled]="!setting.isEditing">
+                        <option value="all">All</option>
+                        <option *ngFor="let option of authorizedOptions" [value]="option">{{ option }}</option>
+                    </select>
+                </div>
+                <div class="input-group checkbox-group">
+                    <label>
+                        <input type="checkbox" [(ngModel)]="setting.enabled" [disabled]="!setting.isEditing" />
+                        Enabled
+                    </label>
+                </div>
+
+                <!-- Buttons (Edit, Save, Delete) -->
+                <div class="button-group">
+                    <button (click)="editSetting(setting)" *ngIf="!setting.isEditing">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button (click)="saveSetting(transaction)" *ngIf="setting.isEditing">
+                        <mat-icon>save</mat-icon>
+                    </button>
+                    <button (click)="deleteSetting(transaction, setting)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JSON Output Window (Only Updates After Save) -->
     <div class="json-output">
-      <h4>Model Output</h4>
-      <pre>{{ savedTransactions | json }}</pre>
+        <h4>Model Output</h4>
+        <pre>{{ savedTransactions | json }}</pre>
     </div>
-  </div>
-  
+</div>
