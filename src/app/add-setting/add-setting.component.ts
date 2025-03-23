@@ -126,7 +126,14 @@ export class AddSettingComponent  {
   }
 
   get sortedSettings() {
-    return [...this.savedSettings].sort((a, b) => b.dateCreated - a.dateCreated);
+    const sorted = [...this.savedSettings].sort((a, b) => a.dateCreated - b.dateCreated);
+    return this.sortDescending ? sorted.reverse() : sorted;
+  }
+
+  sortDescending = true;
+
+  toggleSortDirection() {
+    this.sortDescending = !this.sortDescending;
   }
 
   createFormWithValues(values: any): FormGroup {
@@ -138,4 +145,50 @@ export class AddSettingComponent  {
       authorization: [values.authorization]
     });
   }
+
+  formatCreatedDate(timestamp: number): string {
+    const createdDate = new Date(timestamp);
+    const now = new Date();
+  
+    const isSameDay =
+      createdDate.getFullYear() === now.getFullYear() &&
+      createdDate.getMonth() === now.getMonth() &&
+      createdDate.getDate() === now.getDate();
+  
+    if (isSameDay) {
+      return createdDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); // e.g. 3:45 PM
+    }
+  
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday =
+      createdDate.getFullYear() === yesterday.getFullYear() &&
+      createdDate.getMonth() === yesterday.getMonth() &&
+      createdDate.getDate() === yesterday.getDate();
+  
+    if (isYesterday) {
+      return 'Yesterday';
+    }
+  
+    const diffMs = now.getTime() - createdDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+    return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  }
+
+  selectedTransactionType: string | null = null;
+
+  getFilteredAndSortedSettings(): any[] {
+    let filtered = [...this.savedSettings];
+  
+    if (this.selectedTransactionType) {
+      filtered = filtered.filter(setting =>
+        setting.settingValue.transactionTypes.includes(this.selectedTransactionType!)
+      );
+    }
+  
+    filtered.sort((a, b) => a.dateCreated - b.dateCreated);
+    return this.sortDescending ? filtered.reverse() : filtered;
+  }
+  
 }

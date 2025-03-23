@@ -1,195 +1,211 @@
 <mat-card>
     <mat-card-title>Add New Setting</mat-card-title>
     <mat-card-content>
-      <form [formGroup]="settingForm">
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Transaction Types</mat-label>
-            <mat-select formControlName="transactionTypes" multiple>
-              <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
-                <mat-icon>check_circle</mat-icon> {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Threshold</mat-label>
-            <input matInput formControlName="threshold" type="text"
-                   [value]="settingForm.get('threshold')?.value | currency:'USD':'symbol':'1.0-0'"
-                   (input)="onThresholdInput($event)">
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Frequency</mat-label>
-            <mat-select formControlName="frequency" multiple>
-              <mat-option *ngFor="let option of frequencyOptions" [value]="option">
-                <mat-icon>event</mat-icon> {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Indicator</mat-label>
-            <mat-select formControlName="indicator" multiple>
-              <mat-option *ngFor="let option of indicatorOptions" [value]="option">
-                <mat-icon>flag</mat-icon> {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Authorization</mat-label>
-            <mat-select formControlName="authorization" multiple>
-              <mat-option *ngFor="let option of authorizationOptions" [value]="option">
-                <mat-icon>verified_user</mat-icon> {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <button mat-raised-button color="primary" (click)="saveSetting()">Save</button>
-        </div>
-      </form>
+        <form [formGroup]="settingForm">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Transaction Types</mat-label>
+                    <mat-select formControlName="transactionTypes" multiple>
+                        <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
+                            <mat-icon>check_circle</mat-icon> {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Threshold</mat-label>
+                    <input matInput formControlName="threshold" type="text"
+                        [value]="settingForm.get('threshold')?.value | currency:'USD':'symbol':'1.0-0'"
+                        (input)="onThresholdInput($event)">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Frequency</mat-label>
+                    <mat-select formControlName="frequency" multiple>
+                        <mat-option *ngFor="let option of frequencyOptions" [value]="option">
+                            <mat-icon>event</mat-icon> {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Indicator</mat-label>
+                    <mat-select formControlName="indicator" multiple>
+                        <mat-option *ngFor="let option of indicatorOptions" [value]="option">
+                            <mat-icon>flag</mat-icon> {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Authorization</mat-label>
+                    <mat-select formControlName="authorization" multiple>
+                        <mat-option *ngFor="let option of authorizationOptions" [value]="option">
+                            <mat-icon>verified_user</mat-icon> {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" (click)="saveSetting()">Save</button>
+            </div>
+        </form>
     </mat-card-content>
-  </mat-card>
-  <ng-container *ngFor="let setting of sortedSettings">
-    <mat-card class="setting-card">
-      <mat-card-title>
-        {{ setting.groupName }} ({{ setting.settingsId.slice(0, 8) }}…)
-  
-        <span class="actions">
-          <!-- View Mode -->
-          <ng-container *ngIf="editingId !== setting.settingsId">
-            <button mat-icon-button (click)="startEdit(setting)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteSetting(setting.settingsId)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </ng-container>
-  
-          <!-- Edit Mode -->
-          <ng-container *ngIf="editingId === setting.settingsId">
-            <button mat-icon-button color="primary" (click)="saveEdit(setting.settingsId)" [disabled]="editingForm?.pristine">
-              <mat-icon>check</mat-icon>
-            </button>
-            <button mat-icon-button (click)="cancelEdit()">
-              <mat-icon>close</mat-icon>
-            </button>
-          </ng-container>
-        </span>
-      </mat-card-title>
-  
-      <!-- Edit Mode Content -->
-      <mat-card-content *ngIf="editingId === setting.settingsId" [formGroup]="editingForm!">
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Transaction Types</mat-label>
-            <mat-select formControlName="transactionTypes" multiple>
-              <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Threshold</mat-label>
-            <input matInput formControlName="threshold" type="text">
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Frequency</mat-label>
-            <mat-select formControlName="frequency" multiple>
-              <mat-option *ngFor="let option of frequencyOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Indicator</mat-label>
-            <mat-select formControlName="indicator" multiple>
-              <mat-option *ngFor="let option of indicatorOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Authorization</mat-label>
-            <mat-select formControlName="authorization" multiple>
-              <mat-option *ngFor="let option of authorizationOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-  
-      <!-- View Mode Content -->
-      <mat-card-content *ngIf="editingId !== setting.settingsId" [formGroup]="createFormWithValues(setting.settingValue)">
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Transaction Types</mat-label>
-            <mat-select formControlName="transactionTypes" multiple [disabled]="true">
-              <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Threshold</mat-label>
-            <input matInput formControlName="threshold" type="text" [disabled]="true">
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Frequency</mat-label>
-            <mat-select formControlName="frequency" multiple [disabled]="true">
-              <mat-option *ngFor="let option of frequencyOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Indicator</mat-label>
-            <mat-select formControlName="indicator" multiple [disabled]="true">
-              <mat-option *ngFor="let option of indicatorOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Authorization</mat-label>
-            <mat-select formControlName="authorization" multiple [disabled]="true">
-              <mat-option *ngFor="let option of authorizationOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </ng-container>
-  
-  <mat-card *ngIf="savedSettings.length" class="json-preview-card">
-    <mat-card-title>
-    JSON Preview
-
-    <span class="actions">
-      <button mat-icon-button (click)="toggleJson()" [attr.aria-label]="showJson ? 'Collapse' : 'Expand'">
-        <mat-icon>{{ showJson ? 'expand_less' : 'expand_more' }}</mat-icon>
-      </button>
-
-      <button mat-icon-button (click)="copyJson()" aria-label="Copy JSON to clipboard">
-        <mat-icon>content_copy</mat-icon>
-      </button>
-    </span>
-  </mat-card-title>
-
-  <mat-card-content *ngIf="showJson">
-    <pre>{{ savedSettings | json }}</pre>
-  </mat-card-content>
 </mat-card>
-  
+<div class="sort-controls" *ngIf="savedSettings.length > 0">
+    <button mat-icon-button (click)="toggleSortDirection()"
+        [attr.aria-label]="sortDescending ? 'Sort Ascending' : 'Sort Descending'">
+        <mat-icon>{{ sortDescending ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+    </button>
+    <span>{{ sortDescending ? 'Newest first' : 'Oldest first' }}</span>
+
+    <mat-form-field appearance="outline" class="filter-select">
+        <mat-label>Filter by Transaction Type</mat-label>
+        <mat-select [(value)]="selectedTransactionType">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option *ngFor="let type of transactionTypeOptions" [value]="type">{{ type }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<ng-container *ngFor="let setting of getFilteredAndSortedSettings()">
+    <mat-card class="setting-card">
+        <mat-card-title>
+            Setting# {{ setting.settingsId.slice(0, 8) }}
+            <span class="meta">Created: {{ formatCreatedDate(setting.dateCreated) }}</span>
+            <span class="actions">
+                <!-- View Mode -->
+                <ng-container *ngIf="editingId !== setting.settingsId">
+                    <button mat-icon-button (click)="startEdit(setting)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteSetting(setting.settingsId)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </ng-container>
+
+                <!-- Edit Mode -->
+                <ng-container *ngIf="editingId === setting.settingsId">
+                    <button mat-icon-button color="primary" (click)="saveEdit(setting.settingsId)"
+                        [disabled]="editingForm?.pristine">
+                        <mat-icon>check</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="cancelEdit()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </ng-container>
+            </span>
+        </mat-card-title>
+
+        <!-- Edit Mode Content -->
+        <mat-card-content *ngIf="editingId === setting.settingsId" [formGroup]="editingForm!">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Transaction Types</mat-label>
+                    <mat-select formControlName="transactionTypes" multiple>
+                        <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Threshold</mat-label>
+                    <input matInput formControlName="threshold" type="text">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Frequency</mat-label>
+                    <mat-select formControlName="frequency" multiple>
+                        <mat-option *ngFor="let option of frequencyOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Indicator</mat-label>
+                    <mat-select formControlName="indicator" multiple>
+                        <mat-option *ngFor="let option of indicatorOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Authorization</mat-label>
+                    <mat-select formControlName="authorization" multiple>
+                        <mat-option *ngFor="let option of authorizationOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+
+        <!-- View Mode Content -->
+        <mat-card-content *ngIf="editingId !== setting.settingsId"
+            [formGroup]="createFormWithValues(setting.settingValue)">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Transaction Types</mat-label>
+                    <mat-select formControlName="transactionTypes" multiple [disabled]="true">
+                        <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Threshold</mat-label>
+                    <input matInput formControlName="threshold" type="text" [disabled]="true">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Frequency</mat-label>
+                    <mat-select formControlName="frequency" multiple [disabled]="true">
+                        <mat-option *ngFor="let option of frequencyOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Indicator</mat-label>
+                    <mat-select formControlName="indicator" multiple [disabled]="true">
+                        <mat-option *ngFor="let option of indicatorOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Authorization</mat-label>
+                    <mat-select formControlName="authorization" multiple [disabled]="true">
+                        <mat-option *ngFor="let option of authorizationOptions" [value]="option">
+                            {{ option }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</ng-container>
+
+<mat-card class="json-preview-card">
+    <mat-card-title>
+        JSON Preview
+
+        <span class="actions">
+            <button mat-icon-button (click)="toggleJson()" [attr.aria-label]="showJson ? 'Collapse' : 'Expand'">
+                <mat-icon>{{ showJson ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+
+            <button mat-icon-button (click)="copyJson()" aria-label="Copy JSON to clipboard">
+                <mat-icon>content_copy</mat-icon>
+            </button>
+        </span>
+    </mat-card-title>
+
+    <mat-card-content *ngIf="showJson">
+        <pre>{{ savedSettings | json }}</pre>
+    </mat-card-content>
+</mat-card>
