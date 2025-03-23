@@ -92,7 +92,6 @@ export class TestTransactionDialogComponent {
     this.submitted = true;
     const tx = this.form.value;
 
-    // If no settings exist, consider this a match
     if (!this.savedSettings.length) {
       this.matchFound = true;
       return;
@@ -123,7 +122,6 @@ export class TestTransactionDialogComponent {
         this.matchedRuleId = settingId;
         this.ruleStatuses[settingId] = 'matched';
     
-        // mark all remaining rules as skipped
         const matchedIndex = this.savedSettings.findIndex(s => s.settingsId === settingId);
         for (let i = matchedIndex + 1; i < this.savedSettings.length; i++) {
           this.ruleStatuses[this.savedSettings[i].settingsId] = 'skipped';
