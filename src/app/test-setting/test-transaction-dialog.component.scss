@@ -174,7 +174,8 @@ mat-card {
   }
   
   .test-right {
-    justify-content: flex-end; // optional space for future actions
+    justify-content: flex-end;
+    align-items: center; 
   }
   
   .result-message {
@@ -191,6 +192,12 @@ mat-card {
     }
   }
   
-  
+  .rule-id {
+    font-size: 0.85rem;
+    color: #555;
+    font-family: monospace;
+    white-space: nowrap;
+    padding-top: 5px;
+  }
   
   

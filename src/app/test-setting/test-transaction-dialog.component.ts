@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA  } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -78,34 +78,63 @@ export class TestTransactionDialogComponent {
 
   matchFound = false;
   submitted = false;
+  matchedRuleId: string | null = null;
 
   testTransaction() {
-    if (this.form.valid) {
-      this.submitted = true;
-  
-      this.matchFound = this.savedSettings.length === 0;
-  
-    } else {
+    if (!this.form.valid) {
       this.form.markAllAsTouched();
+      return;
     }
+
+    this.submitted = true;
+    const tx = this.form.value;
+
+    // If no settings exist, consider this a match
+    if (!this.savedSettings.length) {
+      this.matchFound = true;
+      return;
+    }
+
+    // Loop through settings from latest to oldest
+    for (const setting of this.savedSettings) {
+      const value = setting.settingValue;
+
+      const dropdownMatch =
+        value.transactionTypes.includes(tx.transactionTypes) &&
+        value.frequency.includes(tx.frequency) &&
+        value.indicator.includes(tx.indicator) &&
+        value.authorization.includes(tx.authorization);
+
+      const amountMatch =
+        value.threshold === 0 || Number(tx.amount) >= value.threshold;
+
+      if (dropdownMatch && amountMatch) {
+        this.matchFound = true;
+        this.matchedRuleId = setting.settingsId;
+        return;
+      }
+    }
+
+    // If no rule matched
+    this.matchFound = false;
   }
 
   onAmountInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const numericValue = input.value.replace(/\D/g, '');
     const amount = numericValue ? Number(numericValue) : null;
-  
+
     const control = this.form.get('amount');
     control?.setValue(amount);
     control?.markAsDirty();
   }
-  
+
   onAmountBlur(): void {
     const control = this.form.get('amount');
     control?.markAsTouched();
   }
-  
-  
+
+
   formatCurrency(value: string): string {
     if (!value) return '';
     return new Intl.NumberFormat('en-US', {
@@ -118,5 +147,6 @@ export class TestTransactionDialogComponent {
   resetTest() {
     this.matchFound = false;
     this.submitted = false;
+    this.matchedRuleId = null;
   }
 }

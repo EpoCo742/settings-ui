@@ -64,7 +64,11 @@
             </div>
 
             <!-- Right spacer to keep center alignment accurate -->
-            <div class="test-right"></div>
+            <div class="test-right" >
+                <span class="rule-id" *ngIf="submitted && matchFound && matchedRuleId">
+                  Matched Rule ID: <code>{{ matchedRuleId.slice(0, 8) }}…</code>
+                </span>
+            </div>
         </div>
 
     </mat-card-content>
