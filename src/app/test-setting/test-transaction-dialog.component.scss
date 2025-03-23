@@ -199,5 +199,42 @@ mat-card {
     white-space: nowrap;
     padding-top: 5px;
   }
+
+  .status-icon {
+    font-size: 20px;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  
+  .status-icon.matched {
+    color: #2e7d32;
+    animation: pulse 0.4s ease-in-out;
+  }
+  
+  .status-icon.notMatched {
+    color: #d32f2f;
+    animation: shake 0.3s ease-in-out;
+  }
+  
+  .status-icon.skipped {
+    color: #999;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    30% { transform: translateX(-2px); }
+    60% { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+  }
+  
+  .matched-row {
+    background-color: #e8f5e9; // light green
+    transition: background-color 0.3s ease;
+  }
   
   

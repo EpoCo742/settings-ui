@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Inject } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 interface Setting {
   settingsId: string;
@@ -35,7 +36,8 @@ interface Setting {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './test-transaction-dialog.component.html',
   styleUrls: ['./test-transaction-dialog.component.scss']
@@ -79,6 +81,7 @@ export class TestTransactionDialogComponent {
   matchFound = false;
   submitted = false;
   matchedRuleId: string | null = null;
+  ruleStatuses: Record<string, 'matched' | 'notMatched' | 'skipped'> = {};
 
   testTransaction() {
     if (!this.form.valid) {
@@ -95,27 +98,43 @@ export class TestTransactionDialogComponent {
       return;
     }
 
-    // Loop through settings from latest to oldest
+    this.ruleStatuses = {};
+
+    if (!this.savedSettings.length) {
+      this.matchFound = true;
+      return;
+    }
+    
     for (const setting of this.savedSettings) {
       const value = setting.settingValue;
-
+      const settingId = setting.settingsId;
+    
       const dropdownMatch =
         value.transactionTypes.includes(tx.transactionTypes) &&
         value.frequency.includes(tx.frequency) &&
         value.indicator.includes(tx.indicator) &&
         value.authorization.includes(tx.authorization);
-
+    
       const amountMatch =
         value.threshold === 0 || Number(tx.amount) >= value.threshold;
-
+    
       if (dropdownMatch && amountMatch) {
         this.matchFound = true;
-        this.matchedRuleId = setting.settingsId;
+        this.matchedRuleId = settingId;
+        this.ruleStatuses[settingId] = 'matched';
+    
+        // mark all remaining rules as skipped
+        const matchedIndex = this.savedSettings.findIndex(s => s.settingsId === settingId);
+        for (let i = matchedIndex + 1; i < this.savedSettings.length; i++) {
+          this.ruleStatuses[this.savedSettings[i].settingsId] = 'skipped';
+        }
+    
         return;
+      } else {
+        this.ruleStatuses[settingId] = 'notMatched';
       }
     }
-
-    // If no rule matched
+    
     this.matchFound = false;
   }
 
@@ -148,5 +167,17 @@ export class TestTransactionDialogComponent {
     this.matchFound = false;
     this.submitted = false;
     this.matchedRuleId = null;
+    this.ruleStatuses = {};
+  }
+
+  getStatusTooltip(settingId: string): string {
+    const status = this.ruleStatuses[settingId];
+    switch (status) {
+      case 'matched': return 'This rule matched the test transaction';
+      case 'notMatched': return 'This rule was evaluated and did not match';
+      case 'skipped': return 'This rule was not evaluated';
+      default: return 'This rule has not been tested yet';
+    }
   }
 }
+

@@ -64,9 +64,9 @@
             </div>
 
             <!-- Right spacer to keep center alignment accurate -->
-            <div class="test-right" >
+            <div class="test-right">
                 <span class="rule-id" *ngIf="submitted && matchFound && matchedRuleId">
-                  Matched Rule ID: <code>{{ matchedRuleId.slice(0, 8) }}…</code>
+                    Matched Rule ID: <code>{{ matchedRuleId.slice(0, 8) }}…</code>
                 </span>
             </div>
         </div>
@@ -85,6 +85,7 @@
         <table class="summary-table" *ngIf="savedSettings.length; else noSettings">
             <thead>
                 <tr>
+                    <th>Status</th>
                     <th>Setting ID</th>
                     <th>Threshold</th>
                     <th>Transaction Types</th>
@@ -94,7 +95,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let setting of savedSettings">
+                <tr *ngFor="let setting of savedSettings"
+                    [ngClass]="{ 'matched-row': ruleStatuses[setting.settingsId] === 'matched' }">
+                    <td>
+                        <mat-icon [matTooltip]="getStatusTooltip(setting.settingsId)" class="status-icon"
+                            [ngClass]="ruleStatuses[setting.settingsId] || 'skipped'">
+                            {{
+                            ruleStatuses[setting.settingsId] === 'matched' ? 'check_circle' :
+                            ruleStatuses[setting.settingsId] === 'notMatched' ? 'block' :
+                            'do_not_disturb_on'
+                            }}
+                        </mat-icon>
+                    </td>
                     <td>{{ setting.settingsId.slice(0, 8) }}…</td>
                     <td>{{ setting.settingValue.threshold | currency }}</td>
                     <td>{{ setting.settingValue.transactionTypes.join(', ') }}</td>
