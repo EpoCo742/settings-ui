@@ -54,12 +54,17 @@ export class TestTransactionDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.form = this.fb.group({
-      amount: ['0', [Validators.required, Validators.pattern('^[0-9]+$')]],
-      transactionTypes: [[], Validators.required],
-      frequency: [[], Validators.required],
-      indicator: [[], Validators.required],
-      authorization: [[], Validators.required]
+      amount: ['0', [
+        Validators.required,
+        Validators.pattern('^[1-9][0-9]*$'),
+        Validators.min(1)
+      ]],
+      transactionTypes: ['', Validators.required],
+      frequency: ['', Validators.required],
+      indicator: ['', Validators.required],
+      authorization: ['', Validators.required]
     });
+
     this.savedSettings = (data.settings || []).sort(
       (a: Setting, b: Setting) => a.dateCreated - b.dateCreated
     );
@@ -71,20 +76,47 @@ export class TestTransactionDialogComponent {
     this.dialogRef.close();
   }
 
+  matchFound = false;
+  submitted = false;
+
   testTransaction() {
     if (this.form.valid) {
-      const tx = this.form.value;
-      console.log('Transaction to test:', tx);
-      // Future: Call test logic here
+      this.submitted = true;
+  
+      this.matchFound = this.savedSettings.length === 0;
+  
     } else {
       this.form.markAllAsTouched();
     }
   }
 
-  onAmountInput(event: Event) {
-    const input = (event.target as HTMLInputElement).value;
-    const numericOnly = input.replace(/[^0-9]/g, '');
-    this.form.get('amount')?.setValue(numericOnly);
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const numericValue = input.value.replace(/\D/g, '');
+    const amount = numericValue ? Number(numericValue) : null;
+  
+    const control = this.form.get('amount');
+    control?.setValue(amount);
+    control?.markAsDirty();
   }
   
+  onAmountBlur(): void {
+    const control = this.form.get('amount');
+    control?.markAsTouched();
+  }
+  
+  
+  formatCurrency(value: string): string {
+    if (!value) return '';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(Number(value));
+  }
+
+  resetTest() {
+    this.matchFound = false;
+    this.submitted = false;
+  }
 }

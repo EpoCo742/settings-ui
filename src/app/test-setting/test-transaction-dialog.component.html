@@ -7,79 +7,102 @@
         <div class="form-row">
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Amount</mat-label>
-                <input matInput formControlName="amount" type="text" (input)="onAmountInput($event)">
+                <input matInput type="text" [value]="formatCurrency(form.get('amount')?.value)"
+                    (input)="onAmountInput($event)" (blur)="onAmountBlur()" />
+
+                <mat-error *ngIf="form.get('amount')?.hasError('required')">
+                    Amount is required
+                </mat-error>
+                <mat-error *ngIf="form.get('amount')?.hasError('min')">
+                    Amount must be greater than zero
+                </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Transaction Type</mat-label>
-                <mat-select formControlName="transactionTypes" multiple>
+                <mat-select formControlName="transactionTypes">
                     <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">{{ option }}</mat-option>
                 </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Frequency</mat-label>
-                <mat-select formControlName="frequency" multiple>
+                <mat-select formControlName="frequency">
                     <mat-option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</mat-option>
                 </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Indicator</mat-label>
-                <mat-select formControlName="indicator" multiple>
+                <mat-select formControlName="indicator">
                     <mat-option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</mat-option>
                 </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Authorization</mat-label>
-                <mat-select formControlName="authorization" multiple>
+                <mat-select formControlName="authorization">
                     <mat-option *ngFor="let option of authorizationOptions" [value]="option">{{ option }}</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
 
-        <div class="button-row">
-            <button mat-raised-button color="primary" (click)="testTransaction()">Test Transaction</button>
+        <div class="test-row">
+            <!-- Left-aligned button -->
+            <div class="test-left">
+                <button mat-raised-button color="primary" (click)="submitted ? resetTest() : testTransaction()">
+                    <mat-icon>{{ submitted ? 'restart_alt' : 'play_arrow' }}</mat-icon>
+                    {{ submitted ? 'Reset' : 'Test Transaction' }}
+                </button>
+            </div>
+
+            <!-- Centered result message -->
+            <div class="test-center" *ngIf="submitted">
+                <div class="result-message" [ngClass]="{ match: matchFound, noMatch: !matchFound }">
+                    {{ matchFound ? '✅ Transaction Matches' : '❌ No Match Found' }}
+                </div>
+            </div>
+
+            <!-- Right spacer to keep center alignment accurate -->
+            <div class="test-right"></div>
         </div>
+
     </mat-card-content>
 </mat-card>
 <mat-card class="summary-card">
     <mat-card-title>
-      Available Settings
-      <mat-icon class="sort-icon">arrow_upward</mat-icon>
-      <span class="sort-label">Oldest First</span>
+        Available Settings
+        <mat-icon class="sort-icon">arrow_upward</mat-icon>
+        <span class="sort-label">Oldest First</span>
     </mat-card-title>
-    
-  
+
+
     <mat-card-content>
-      <table class="summary-table" *ngIf="savedSettings.length; else noSettings">
-        <thead>
-          <tr>
-            <th>Setting ID</th>
-            <th>Threshold</th>
-            <th>Transaction Types</th>
-            <th>Frequency</th>
-            <th>Indicator</th>
-            <th>Authorization</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let setting of savedSettings">
-            <td>{{ setting.settingsId.slice(0, 8) }}…</td>
-            <td>{{ setting.settingValue.threshold | currency }}</td>
-            <td>{{ setting.settingValue.transactionTypes.join(', ') }}</td>
-            <td>{{ setting.settingValue.frequency.join(', ') }}</td>
-            <td>{{ setting.settingValue.indicator.join(', ') }}</td>
-            <td>{{ setting.settingValue.authorization.join(', ') }}</td>
-          </tr>
-        </tbody>
-      </table>
-  
-      <ng-template #noSettings>
-        <p>No settings available.</p>
-      </ng-template>
+        <table class="summary-table" *ngIf="savedSettings.length; else noSettings">
+            <thead>
+                <tr>
+                    <th>Setting ID</th>
+                    <th>Threshold</th>
+                    <th>Transaction Types</th>
+                    <th>Frequency</th>
+                    <th>Indicator</th>
+                    <th>Authorization</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let setting of savedSettings">
+                    <td>{{ setting.settingsId.slice(0, 8) }}…</td>
+                    <td>{{ setting.settingValue.threshold | currency }}</td>
+                    <td>{{ setting.settingValue.transactionTypes.join(', ') }}</td>
+                    <td>{{ setting.settingValue.frequency.join(', ') }}</td>
+                    <td>{{ setting.settingValue.indicator.join(', ') }}</td>
+                    <td>{{ setting.settingValue.authorization.join(', ') }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <ng-template #noSettings>
+            <p>No settings available.</p>
+        </ng-template>
     </mat-card-content>
-  </mat-card>
-  
-  
+</mat-card>

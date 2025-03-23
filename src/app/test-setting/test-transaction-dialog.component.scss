@@ -31,6 +31,9 @@ mat-card {
         flex: 1 1 160px;
         min-width: 140px;
         max-width: 200px;
+        mat-select {
+            height: 24px;
+          }
 
         ::ng-deep .mat-form-field-wrapper {
             padding-bottom: 0 !important;
@@ -47,18 +50,7 @@ mat-card {
             line-height: 32px !important;
             font-size: 0.875rem !important;
         }
-    }
-
-    .button-row {
-        display: flex;
-        justify-content: flex-start;
-        margin-top: 0.5rem;
-
-        button {
-            height: 36px;
-            font-size: 0.85rem;
-        }
-    }
+    }     
 }
 
 ::ng-deep .mat-dialog-container {
@@ -150,5 +142,55 @@ mat-card {
   mat-card + mat-card {
     margin-top: 0.25rem;
   }
+  
+  .result-message {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 0.95rem;
+  }
+
+  .test-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+  .test-left,
+  .test-center,
+  .test-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  
+  .test-left {
+    justify-content: flex-start;
+  }
+  
+  .test-center {
+    justify-content: center;
+  }
+  
+  .test-right {
+    justify-content: flex-end; // optional space for future actions
+  }
+  
+  .result-message {
+    font-weight: 800;
+    font-size: 1.0rem;
+    white-space: nowrap;
+  
+    &.match {
+      color: #2e7d32;
+    }
+  
+    &.noMatch {
+      color: #d32f2f;
+    }
+  }
+  
+  
   
   
