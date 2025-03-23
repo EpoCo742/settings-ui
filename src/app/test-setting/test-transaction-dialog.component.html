@@ -1,0 +1,46 @@
+<mat-card>
+    <button mat-icon-button class="close-button" (click)="close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+    </button>
+    <mat-card-title>Test Transaction</mat-card-title>
+    <mat-card-content [formGroup]="form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Amount</mat-label>
+                <input matInput formControlName="amount" type="text" (input)="onAmountInput($event)">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Transaction Type</mat-label>
+                <mat-select formControlName="transactionTypes" multiple>
+                    <mat-option *ngFor="let option of transactionTypeOptions" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Frequency</mat-label>
+                <mat-select formControlName="frequency" multiple>
+                    <mat-option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Indicator</mat-label>
+                <mat-select formControlName="indicator" multiple>
+                    <mat-option *ngFor="let option of indicatorOptions" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Authorization</mat-label>
+                <mat-select formControlName="authorization" multiple>
+                    <mat-option *ngFor="let option of authorizationOptions" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="button-row">
+            <button mat-raised-button color="primary" (click)="testTransaction()">Test Transaction</button>
+        </div>
+    </mat-card-content>
+</mat-card>
