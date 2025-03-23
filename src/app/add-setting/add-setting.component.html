@@ -46,18 +46,29 @@
                     </mat-select>
                 </mat-form-field>
 
-                <button mat-raised-button color="primary" (click)="saveSetting()">Save</button>
+                <button mat-raised-button color="primary" (click)="saveSetting()">
+                    <mat-icon>save</mat-icon>
+                    Save
+                  </button>
             </div>
         </form>
     </mat-card-content>
 </mat-card>
-<div class="sort-controls" *ngIf="savedSettings.length > 0">
-    <button mat-icon-button (click)="toggleSortDirection()"
-        [attr.aria-label]="sortDescending ? 'Sort Ascending' : 'Sort Descending'">
-        <mat-icon>{{ sortDescending ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-    </button>
-    <span>{{ sortDescending ? 'Newest first' : 'Oldest first' }}</span>
-
+<div class="sort-controls" >
+    <div class="toolbar-left">
+        <button mat-icon-button (click)="toggleSortDirection()"
+            [attr.aria-label]="sortDescending ? 'Sort Ascending' : 'Sort Descending'">
+            <mat-icon>{{ sortDescending ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+        </button>
+        <span>{{ sortDescending ? 'Newest First' : 'Oldest First' }}</span>
+    </div>
+    <div class="toolbar-center">
+        <button mat-raised-button color="accent" (click)="openTestTransactionDialog()">
+            <mat-icon>science</mat-icon>
+            Test Transaction
+        </button>
+    </div>
+    <div class="toolbar-right"></div>
     <mat-form-field appearance="outline" class="filter-select">
         <mat-label>Filter by Transaction Type</mat-label>
         <mat-select [(value)]="selectedTransactionType">
@@ -66,10 +77,16 @@
         </mat-select>
     </mat-form-field>
 </div>
+<div *ngIf="!savedSettings.length" class="empty-state">
+    <mat-icon class="empty-icon">rules</mat-icon>
+    <h3>No settings yet</h3>
+    <p>Start by adding a new setting using the form above.</p>
+  </div>
 <ng-container *ngFor="let setting of getFilteredAndSortedSettings()">
-    <mat-card class="setting-card">
+    <mat-card class="setting-card"
+            [ngClass]="{ 'newly-added': setting.settingsId === newSettingId }">
         <mat-card-title>
-            Setting# {{ setting.settingsId.slice(0, 8) }}
+            Setting {{ setting.settingsId.slice(0, 8) }}...
             <span class="meta">Created: {{ formatCreatedDate(setting.dateCreated) }}</span>
             <span class="actions">
                 <!-- View Mode -->
@@ -194,14 +211,15 @@
     <mat-card-title>
         JSON Preview
 
-        <span class="actions">
+        <span class="json-actions">
             <button mat-icon-button (click)="toggleJson()" [attr.aria-label]="showJson ? 'Collapse' : 'Expand'">
                 <mat-icon>{{ showJson ? 'expand_less' : 'expand_more' }}</mat-icon>
             </button>
 
-            <button mat-icon-button (click)="copyJson()" aria-label="Copy JSON to clipboard">
+            <button mat-icon-button (click)="copyJson()" matTooltip="Copy JSON">
                 <mat-icon>content_copy</mat-icon>
             </button>
+            <span class="copy-confirm" *ngIf="copiedJson">Copied!</span>
         </span>
     </mat-card-title>
 

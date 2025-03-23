@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { v4 as uuidv4 } from 'uuid';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { TestTransactionDialogComponent } from '../test-setting/test-transaction-dialog.component';
 
 @Component({
   selector: 'app-add-setting',
@@ -39,7 +41,7 @@ export class AddSettingComponent implements OnInit {
   indicatorOptions = ['primary', 'secondary'];
   authorizationOptions = ['yes', 'no'];
 
-  constructor(private fb: FormBuilder, private clipboard: Clipboard) {
+  constructor(private fb: FormBuilder, private clipboard: Clipboard, private dialog: MatDialog) {
     this.settingForm = this.fb.group({
       transactionTypes: [[], Validators.required],
       threshold: ['0', [Validators.required, Validators.pattern('^[0-9]+$')]],
@@ -70,10 +72,20 @@ export class AddSettingComponent implements OnInit {
     this.showJson = !this.showJson;
   }
 
+  copiedJson: boolean = false;
+
   copyJson() {
-    const json = JSON.stringify(this.savedSettings, null, 2);
-    this.clipboard.copy(json);
+    const jsonText = JSON.stringify(this.savedSettings, null, 2);
+    navigator.clipboard.writeText(jsonText).then(() => {
+      this.copiedJson = true;
+  
+      setTimeout(() => {
+        this.copiedJson = false;
+      }, 2000);
+    });
   }
+
+  newSettingId: string | null = null;
 
   saveSetting() {
     if (this.settingForm.valid) {
@@ -87,20 +99,13 @@ export class AddSettingComponent implements OnInit {
         }
       };
 
-      this.savedSettings = [newSetting, ...this.savedSettings];
-
+      this.savedSettings.unshift(newSetting);
+      this.newSettingId = newSetting.settingsId;
       this.updateSessionStorage();
 
-      this.settingForm.setValue({
-        transactionTypes: [],
-        threshold: '0',
-        frequency: [],
-        indicator: [],
-        authorization: []
-      });
-
-      this.settingForm.markAsPristine();
-      this.settingForm.markAsUntouched();
+      setTimeout(() => {
+        this.newSettingId = null;
+      }, 500);
     } else {
       this.settingForm.markAllAsTouched();
     }
@@ -114,6 +119,7 @@ export class AddSettingComponent implements OnInit {
 
   deleteSetting(id: string) {
     this.savedSettings = this.savedSettings.filter(s => s.settingsId !== id);
+    this.updateSessionStorage();
   }
 
   startEdit(setting: any) {
@@ -137,6 +143,7 @@ export class AddSettingComponent implements OnInit {
       const idx = this.savedSettings.findIndex(s => s.settingsId === id);
       if (idx >= 0) {
         this.savedSettings[idx].settingValue = { ...this.editingForm.value };
+        this.updateSessionStorage();
       }
       this.cancelEdit();
     }
@@ -147,7 +154,7 @@ export class AddSettingComponent implements OnInit {
     return this.sortDescending ? sorted.reverse() : sorted;
   }
 
-  sortDescending = true;
+  sortDescending = false;
 
   toggleSortDirection() {
     this.sortDescending = !this.sortDescending;
@@ -210,5 +217,15 @@ export class AddSettingComponent implements OnInit {
 
   private updateSessionStorage() {
     sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(this.savedSettings));
+  }
+
+  openTestTransactionDialog() {
+    this.dialog.open(TestTransactionDialogComponent, {
+      maxWidth: '1100px',
+      panelClass: 'test-transaction-dialog',
+      data: {
+        settings: this.savedSettings
+      }
+    });
   }
 }
