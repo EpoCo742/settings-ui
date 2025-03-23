@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA  } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +8,21 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Inject } from '@angular/core';
+
+interface Setting {
+  settingsId: string;
+  groupId: number;
+  groupName: string;
+  dateCreated: number;
+  settingValue: {
+    transactionTypes: string[];
+    frequency: string[];
+    indicator: string[];
+    authorization: string[];
+    threshold: number;
+  };
+}
 
 @Component({
   selector: 'app-test-transaction-dialog',
@@ -35,7 +50,8 @@ export class TestTransactionDialogComponent {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<TestTransactionDialogComponent>
+    private dialogRef: MatDialogRef<TestTransactionDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.form = this.fb.group({
       amount: ['0', [Validators.required, Validators.pattern('^[0-9]+$')]],
@@ -44,7 +60,12 @@ export class TestTransactionDialogComponent {
       indicator: [[], Validators.required],
       authorization: [[], Validators.required]
     });
+    this.savedSettings = (data.settings || []).sort(
+      (a: Setting, b: Setting) => a.dateCreated - b.dateCreated
+    );
   }
+
+  savedSettings: Setting[] = [];
 
   close() {
     this.dialogRef.close();
@@ -65,4 +86,5 @@ export class TestTransactionDialogComponent {
     const numericOnly = input.replace(/[^0-9]/g, '');
     this.form.get('amount')?.setValue(numericOnly);
   }
+  
 }
