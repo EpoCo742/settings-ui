@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { v4 as uuidv4 } from 'uuid';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-add-setting',
@@ -26,7 +27,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
     MatIconModule,
   ]
 })
-export class AddSettingComponent  {
+export class AddSettingComponent implements OnInit {
   settingForm: FormGroup;
   savedSettings: any[] = [];
 
@@ -48,9 +49,23 @@ export class AddSettingComponent  {
     });
   }
 
+  readonly SESSION_KEY = 'savedSettings';
+
+  ngOnInit(): void {
+    const stored = sessionStorage.getItem(this.SESSION_KEY);
+    if (stored) {
+      try {
+        this.savedSettings = JSON.parse(stored);
+      } catch (e) {
+        console.warn('Invalid session data, resetting.');
+        this.savedSettings = [];
+      }
+    }
+  }
+
   showJson = true;
   editingSettingId: string | null = null;
-  
+
   toggleJson() {
     this.showJson = !this.showJson;
   }
@@ -73,7 +88,9 @@ export class AddSettingComponent  {
       };
 
       this.savedSettings = [newSetting, ...this.savedSettings];
-      
+
+      this.updateSessionStorage();
+
       this.settingForm.setValue({
         transactionTypes: [],
         threshold: '0',
@@ -149,30 +166,30 @@ export class AddSettingComponent  {
   formatCreatedDate(timestamp: number): string {
     const createdDate = new Date(timestamp);
     const now = new Date();
-  
+
     const isSameDay =
       createdDate.getFullYear() === now.getFullYear() &&
       createdDate.getMonth() === now.getMonth() &&
       createdDate.getDate() === now.getDate();
-  
+
     if (isSameDay) {
       return createdDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); // e.g. 3:45 PM
     }
-  
+
     const yesterday = new Date();
     yesterday.setDate(now.getDate() - 1);
     const isYesterday =
       createdDate.getFullYear() === yesterday.getFullYear() &&
       createdDate.getMonth() === yesterday.getMonth() &&
       createdDate.getDate() === yesterday.getDate();
-  
+
     if (isYesterday) {
       return 'Yesterday';
     }
-  
+
     const diffMs = now.getTime() - createdDate.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
     return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
   }
 
@@ -180,15 +197,18 @@ export class AddSettingComponent  {
 
   getFilteredAndSortedSettings(): any[] {
     let filtered = [...this.savedSettings];
-  
+
     if (this.selectedTransactionType) {
       filtered = filtered.filter(setting =>
         setting.settingValue.transactionTypes.includes(this.selectedTransactionType!)
       );
     }
-  
+
     filtered.sort((a, b) => a.dateCreated - b.dateCreated);
     return this.sortDescending ? filtered.reverse() : filtered;
   }
-  
+
+  private updateSessionStorage() {
+    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(this.savedSettings));
+  }
 }
