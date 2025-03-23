@@ -237,4 +237,22 @@ mat-card {
     transition: background-color 0.3s ease;
   }
   
+  .empty-placeholder {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #999;
+  
+    mat-icon {
+      font-size: 28px;
+      margin-bottom: 1rem;
+      color: #ccc;
+    }
+  
+    p {
+      font-size: 1.25rem;
+      margin: 0;
+      opacity: 0.8;
+    }
+  }
+  
   

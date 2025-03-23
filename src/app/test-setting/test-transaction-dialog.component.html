@@ -79,10 +79,8 @@
         <mat-icon class="sort-icon">arrow_upward</mat-icon>
         <span class="sort-label">Oldest First</span>
     </mat-card-title>
-
-
     <mat-card-content>
-        <table class="summary-table" *ngIf="savedSettings.length; else noSettings">
+        <table class="summary-table" *ngIf="savedSettings.length; else noSettingsPlaceholder">
             <thead>
                 <tr>
                     <th>Status</th>
@@ -117,8 +115,11 @@
             </tbody>
         </table>
 
-        <ng-template #noSettings>
-            <p>No settings available.</p>
-        </ng-template>
+        <ng-template #noSettingsPlaceholder>
+            <div class="empty-placeholder">
+              <mat-icon>rule</mat-icon>
+              <p>No settings to evaluate yet.</p>
+            </div>
+          </ng-template>
     </mat-card-content>
 </mat-card>
