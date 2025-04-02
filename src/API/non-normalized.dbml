@@ -1,0 +1,30 @@
+Table settings {
+  settings_id uuid [pk]
+  group_id int [not null, note: 'Group this setting belongs to']
+  group_name varchar(50)
+  created_by varchar(50)
+  updated_by varchar(50)
+  date_created bigint
+  date_updated bigint
+  threshold decimal(18,2) [not null]
+  transaction_types varchar(255) [not null, note: 'Comma-separated list']
+  frequency varchar(100) [note: 'Comma-separated list']
+  indicator varchar(100) [note: 'Comma-separated list']
+  authorization varchar(100) [note: 'Comma-separated list']
+  is_deleted boolean [default: false]
+  deleted_by varchar(50)
+  deleted_at bigint
+
+  Indexes {
+    group_id
+  }
+}
+
+Table setting_audit {
+  id int [pk, increment]
+  settings_id uuid [ref: > settings.settings_id]
+  operation varchar(10) [not null, note: 'create, update, delete']
+  changed_by varchar(50)
+  change_timestamp bigint
+  change_summary text
+}

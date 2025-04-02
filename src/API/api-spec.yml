@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: Settings API
+  version: 1.0.0
+  description: REST API for managing settings using JSON:API format.
+
+servers:
+  - url: https://api.example.com/v1
+
+tags:
+  - name: Settings
+    description: Operations for managing settings in JSON:API format
+
+paths:
+  /api/settings:
+    get:
+      summary: Get all settings for the current user's group
+      tags: [Settings]
+      responses:
+        '200':
+          description: List of settings
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SettingsList'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+      security:
+        - bearerAuth: []
+
+    post:
+      summary: Create a new setting
+      tags: [Settings]
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/SettingCreateRequest'
+      responses:
+        '201':
+          description: Created setting
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SettingResponse'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+      security:
+        - bearerAuth: []
+
+  /api/settings/{settingsId}:
+    get:
+      summary: Get a specific setting by ID
+      tags: [Settings]
+      parameters:
+        - $ref: '#/components/parameters/SettingsId'
+      responses:
+        '200':
+          description: Single setting
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SettingResponse'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+      security:
+        - bearerAuth: []
+
+    patch:
+      summary: Update an existing setting
+      tags: [Settings]
+      parameters:
+        - $ref: '#/components/parameters/SettingsId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: '#/components/schemas/SettingUpdateRequest'
+      responses:
+        '200':
+          description: Updated setting
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/SettingResponse'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Delete a setting by ID
+      tags: [Settings]
+      parameters:
+        - $ref: '#/components/parameters/SettingsId'
+      responses:
+        '204':
+          description: Deleted successfully
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+      security:
+        - bearerAuth: []
+
+components:
+  parameters:
+    SettingsId:
+      name: settingsId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/vnd.api+json:
+          example:
+            errors:
+              - status: "400"
+                title: "Bad Request"
+                detail: "Invalid input format for settingValue"
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Forbidden
+    NotFound:
+      description: Not found
+    InternalError:
+      description: Internal server error
+      content:
+        application/vnd.api+json:
+          example:
+            errors:
+              - status: "500"
+                title: "Internal Server Error"
+                detail: "An unexpected error occurred while processing the request"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SettingsList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingResource'
+
+    SettingResponse:
+      type: object
+      required: [data]
+      example:
+        data:
+          id: f783fb2d-51cd-4e8d-9ea8-c38387f6e62f
+          type: setting
+          attributes:
+            groupId: 12345
+            groupName: group
+            dateCreated: 1743556313293
+            dateUpdated: 1743556313293
+            createdBy: userName
+            updatedBy: userName
+            settingValue:
+              transactionTypes: ["one", "two"]
+              threshold: 10000
+              frequency: ["weekly"]
+              indicator: ["primary", "secondary"]
+              authorization: ["yes", "no"]
+      properties:
+        data:
+          $ref: '#/components/schemas/SettingResource'
+
+    SettingResource:
+      type: object
+      required: [id, type, attributes]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [setting]
+        attributes:
+          $ref: '#/components/schemas/SettingAttributes'
+
+    SettingAttributes:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          example: 12345
+        groupName:
+          type: string
+          example: group
+        dateCreated:
+          type: integer
+          example: 1743556313293
+        dateUpdated:
+          type: integer
+          example: 1743556313293
+        createdBy:
+          type: string
+          example: userName
+        updatedBy:
+          type: string
+          example: userName
+        settingValue:
+          type: object
+          properties:
+            transactionTypes:
+              type: array
+              items:
+                type: string
+              example: ["one", "two"]
+            threshold:
+              type: number
+              example: 10000
+            frequency:
+              type: array
+              items:
+                type: string
+              example: ["weekly"]
+            indicator:
+              type: array
+              items:
+                type: string
+              example: ["primary", "secondary"]
+            authorization:
+              type: array
+              items:
+                type: string
+              example: ["yes", "no"]
+
+    SettingCreateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [type, attributes]
+          properties:
+            type:
+              type: string
+              enum: [setting]
+            attributes:
+              type: object
+              required: [settingValue]
+              properties:
+                settingValue:
+                  $ref: '#/components/schemas/SettingAttributes/properties/settingValue'
+
+    SettingUpdateRequest:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, type, attributes]
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum: [setting]
+            attributes:
+              type: object
+              required: [settingValue]
+              properties:
+                settingValue:
+                  $ref: '#/components/schemas/SettingAttributes/properties/settingValue'

@@ -1,0 +1,60 @@
+Table settings {
+  settings_id uuid [pk]
+  group_id int [not null, note: 'Group this setting belongs to']
+  group_name varchar(50)
+  created_by varchar(50)
+  updated_by varchar(50)
+  date_created bigint
+  date_updated bigint
+  threshold decimal(18,2) [not null]
+  is_deleted boolean [default: false]
+  deleted_by varchar(50)
+  deleted_at bigint
+
+  Indexes {
+    group_id
+  }
+}
+
+Table transaction_types {
+  id int [pk, increment]
+  settings_id uuid
+  value varchar(20) [not null]
+
+  Indexes {
+    (settings_id, value)
+  }
+}
+
+Table frequency {
+  id int [pk, increment]
+  settings_id uuid
+  value varchar(20) [not null, note: 'Enum: weekly, monthly, annual']
+}
+
+Table indicator {
+  id int [pk, increment]
+  settings_id uuid
+  value varchar(20) [not null, note: 'Enum: primary, secondary']
+}
+
+Table authorization {
+  id int [pk, increment]
+  settings_id uuid
+  value varchar(20) [not null, note: 'Enum: yes, no']
+}
+
+Table setting_audit {
+  id int [pk, increment]
+  settings_id uuid
+  operation varchar(10) [not null, note: 'create, update, delete']
+  changed_by varchar(50)
+  change_timestamp bigint
+  change_summary text
+}
+
+Ref: transaction_types.settings_id > settings.settings_id [delete: cascade]
+Ref: frequency.settings_id > settings.settings_id [delete: cascade]
+Ref: indicator.settings_id > settings.settings_id [delete: cascade]
+Ref: authorization.settings_id > settings.settings_id [delete: cascade]
+Ref: setting_audit.settings_id > settings.settings_id
